@@ -51,6 +51,16 @@ Please refer to our [paper](https://arxiv.org/abs/2503.24290) for more insights 
 
 ## Releases 📦
 
+<strong>[2025/06/03]</strong>
+We release [ORZ-R1-Distill-Qwen-14B](https://huggingface.co/Open-Reasoner-Zero/ORZ-R1-Distill-Qwen-14B), obtained by applying ORZ recipe to reasoning-enhanced models like DeepSeek-R1-Distill-Qwen-14B. This ORZ-R1-Distill-Qwen-14B achieves strong results on reasoning benchmarks, even surpassing the larger DeepSeek-R1-Distill-Qwen-32B model.
+
+| Model                        | AIME 2024 | AIME 2025 | MATH500 | GPQA Dia. |
+| ---------------------------- | --------- | --------- | ------- | --------- |
+| DeepSeek-R1-Distill-Qwen-14B | 69.7      | 49.1      | 93.9    | 59.1      |
+| DeepSeek-R1-Distill-Qwen-32B | 72.6      | 60.0      | 94.3    | **62.1**     |
+| **ORZ-R1-Distill-Qwen-14B**  | **75.2**  | **60.0**  | **95.6** | 60.4  |
+
+
 <strong>[2025/03/31]</strong>
 We announce a major milestone for `Open-Reasoner-Zero`:
 
