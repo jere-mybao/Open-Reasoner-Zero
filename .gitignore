@@ -231,3 +231,15 @@ outputs/
 
 scratchpad/
 
+# SLURM job outputs
+slurm_outputs/
+*.out
+*.err
+
+# PPO training outputs
+orz_ckpt/
+orz_logs/
+
+# Ray temporary files
+ray_results/
+

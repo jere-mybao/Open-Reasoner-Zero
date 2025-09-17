@@ -137,7 +137,7 @@ class Actor(nn.Module):
                 trust_remote_code=True,
                 attn_implementation=attn_implementation,
                 quantization_config=nf4_config,
-                torch_dtype=torch.bfloat16 if bf16 else "auto",
+                dtype=torch.bfloat16 if bf16 else "auto",
                 device_map=device_map,
             )
 
@@ -526,7 +526,7 @@ def get_llm_for_sequence_regression(
         model_name_or_path,
         config=config,
         trust_remote_code=True,
-        torch_dtype=torch.bfloat16 if bf16 else "auto",
+        dtype=torch.bfloat16 if bf16 else "auto",
         quantization_config=nf4_config,
         device_map=device_map,
         **kwargs,

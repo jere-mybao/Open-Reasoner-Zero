@@ -1,4 +1,5 @@
 import json
+import os
 from dataclasses import dataclass
 from functools import cached_property
 from typing import Optional
@@ -212,17 +213,23 @@ class BasePPOExp(BaseExp):
         _validate_args(self.cfg)
 
         # initialize the ray cluster
-        ray.init(
-            runtime_env=RuntimeEnv(
-                env_vars={
-                    "NCCL_DEBUG": "WARN",
-                    "NCCL_PXN_DISABLE": "1",
-                    "NCCL_ALGO": "^Ring",
-                    "NCCL_NET_OVERHEAD": "1000000",
-                    "CUDA_LAUNCH_BLOCKING": "1",
-                }
-            )
+        ray_address = os.environ.get("RAY_ADDRESS", "").strip()
+        runtime_env = RuntimeEnv(
+            env_vars={
+                "NCCL_DEBUG": "WARN",
+                "NCCL_PXN_DISABLE": "1",
+                "NCCL_ALGO": "^Ring",
+                "NCCL_NET_OVERHEAD": "1000000",
+                "CUDA_LAUNCH_BLOCKING": "1",
+            }
         )
+        if ray_address:
+            # Connect to existing cluster; must NOT pass num_cpus/num_gpus.
+            ray.init(address=ray_address, runtime_env=runtime_env)
+        else:
+            # Start local Ray explicitly; OK to bound CPUs. Default to SLURM_CPUS_PER_TASK or 16.
+            num_cpus = int(os.environ.get("SLURM_CPUS_PER_TASK", "16"))
+            ray.init(address="local", runtime_env=runtime_env, num_cpus=num_cpus)
 
         # build the models
         await self.trainer.build_models(self.PolicyRayActor, self.CriticRayActor, self.RefRayActor, self.RewardRayActor)
