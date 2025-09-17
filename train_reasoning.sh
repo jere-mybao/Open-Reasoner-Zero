@@ -9,10 +9,18 @@
 #SBATCH --gres=gpu:8                                    ## Number of GPUs
 #SBATCH --exclude=neu[301,306]                          ## Exclude some nodes
 #SBATCH --job-name=train_orz                            ## Job Name
-#SBATCH --output=slurm_outputs/%x/out_log_%x_%j.out     ## Error File
-#SBATCH --error=slurm_outputs/%x/err_log_%x_%j.err      ## Output File
+#SBATCH --output=slurm_outputs/%x/out_log_%x_%j.out     ## Stdout File
+#SBATCH --error=slurm_outputs/%x/err_log_%x_%j.err      ## Stderr File
 #SBATCH --mail-type=BEGIN,END,FAIL                      ## Mail events, e.g., NONE, BEGIN, END, FAIL, ALL.
 #SBATCH --mail-user=jeremy.bao@princeton.edu
+
+set -euo pipefail
+
+# If not running under Slurm, auto-submit this script to avoid login-node execution.
+if [[ -z "${SLURM_JOB_ID:-}" ]]; then
+  echo "[INFO] Not inside a Slurm job. Submitting via sbatch to avoid running on the login node..."
+  exec sbatch "$0"
+fi
 
 
 cd /n/fs/jborz/projects/Open-Reasoner-Zero
@@ -33,6 +41,9 @@ export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
 # SLURM-specific threading
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+
+# Ensure output directories exist
+mkdir -p slurm_outputs/train_orz
 
 # launch under srun so Slurm tracks GPU usage
 srun --ntasks=1 --cpus-per-task=$SLURM_CPUS_PER_TASK --gpu-bind=closest \

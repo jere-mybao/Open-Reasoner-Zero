@@ -214,6 +214,8 @@ class BasePPOExp(BaseExp):
 
         # initialize the ray cluster
         ray_address = os.environ.get("RAY_ADDRESS", "").strip()
+        slurm_job_id = os.environ.get("SLURM_JOB_ID")
+        allow_login = os.environ.get("ORZ_ALLOW_LOGIN", "0") in {"1", "true", "True"}
         runtime_env = RuntimeEnv(
             env_vars={
                 "NCCL_DEBUG": "WARN",
@@ -227,6 +229,13 @@ class BasePPOExp(BaseExp):
             # Connect to existing cluster; must NOT pass num_cpus/num_gpus.
             ray.init(address=ray_address, runtime_env=runtime_env)
         else:
+            # If not attached to a Ray cluster, require running inside a Slurm allocation
+            # to avoid starting Ray on a login node by accident.
+            if not slurm_job_id and not allow_login:
+                raise RuntimeError(
+                    "Refusing to start Ray on a login node. Run inside srun/salloc/sbatch or set RAY_ADDRESS. "
+                    "For quick non-compute tests only, set ORZ_ALLOW_LOGIN=1."
+                )
             # Start local Ray explicitly; OK to bound CPUs. Default to SLURM_CPUS_PER_TASK or 16.
             num_cpus = int(os.environ.get("SLURM_CPUS_PER_TASK", "16"))
             ray.init(address="local", runtime_env=runtime_env, num_cpus=num_cpus)

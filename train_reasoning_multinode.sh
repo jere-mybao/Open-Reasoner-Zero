@@ -1,5 +1,13 @@
 #!/bin/bash
 
+set -euo pipefail
+
+# If not running under Slurm, auto-submit to avoid login-node execution.
+if [[ -z "${SLURM_JOB_ID:-}" ]]; then
+  echo "[INFO] Not inside a Slurm job. Submitting via sbatch to avoid running on the login node..."
+  exec sbatch "$0"
+fi
+
 #SBATCH --nodes=2                                       ## Node count
 #SBATCH --ntasks=2
 #SBATCH --cpus-per-task=48                              ## CPU per task
@@ -13,8 +21,6 @@
 #SBATCH --mail-type=BEGIN,END,FAIL                      ## Mail events
 #SBATCH --mail-user=jeremy.bao@princeton.edu
 
-set -euo pipefail
-
 cd /n/fs/jborz/projects/Open-Reasoner-Zero
 module load cudatoolkit/12.1
 source .venv/bin/activate
@@ -26,6 +32,8 @@ mkdir -p "$TRITON_CACHE_DIR" "$TORCH_EXTENSIONS_DIR"
 
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK:-48}
+
+mkdir -p slurm_outputs/train_orz_multi
 
 # Determine head node hostname/IP and free port
 HEAD_NODE=$(scontrol show hostnames "$SLURM_JOB_NODELIST" | head -n 1)
