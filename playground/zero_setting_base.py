@@ -11,13 +11,36 @@ class CustomDataset(PromptDataset):
 
     def process_dialogue(self, dialogue: List):
         prompt_template_jinja = """\
-{{bos_token}}A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. \
-The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>. User: {{prompt}}
+{{bos_token}}You are an expert reasoning evaluator. Your task is to meticulously examine another model's reasoning trace, step-by-step logic, and inferential patterns to determine whether its final answer is more likely to be correct or incorrect.
+
+You will be provided with:
+1. An original question
+2. Another model's reasoning process and answer with confidence in the format {answer, confidence}
+
+Focus your evaluation on:
+1. **Logical Structure**: Are the reasoning steps logically connected and valid?
+2. **Evidence Quality**: How strong and reliable are the sources and claims presented?
+3. **Inferential Gaps**: Are there missing steps or unjustified leaps in logic?
+4. **Consistency**: Does the reasoning remain internally consistent throughout?
+5. **Confidence Calibration**: Is the stated confidence level appropriate given the evidence?
+
+Your evaluation process should be:
+1. Trace through each reasoning step systematically
+2. Identify specific strengths and weaknesses in the logical flow
+3. Assess the quality of evidence and sources cited
+4. Evaluate whether conclusions follow from premises
+5. Consider alternative explanations or counterarguments
+
+Your analysis should be enclosed within <think> </think> tags, and your final judgment should be in <answer> </answer> tags using only:
+- 1 if the first model's answer is more likely to be correct
+- 0 if the first model's answer is more likely to be incorrect
+
+User: {{prompt}}
 Assistant: <think>\
 """
         prompt_instruction_template_jinja = """\
-You must put your answer inside <answer> </answer> tags, i.e., <answer> answer here </answer>. And your final answer will be extracted automatically by the \\boxed{} tag.
-This is the problem:
+Analyze the following model's step-by-step reasoning process. Focus on the logical flow, evidence quality, and inferential validity rather than independently solving the problem.
+
 {{prompt}}
 """
 
@@ -43,13 +66,36 @@ class EvalCustomDataset(PromptDataset):
 
     def process_dialogue(self, dialogue: dict):
         prompt_template_jinja = """\
-{{bos_token}}A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer. \
-The reasoning process is enclosed within <think> </think> and answer is enclosed within <answer> </answer> tags, respectively, i.e., <think> reasoning process here </think> <answer> answer here </answer>. User: {{prompt}}
+{{bos_token}}You are an expert reasoning evaluator. Your task is to meticulously examine another model's reasoning trace, step-by-step logic, and inferential patterns to determine whether its final answer is more likely to be correct or incorrect.
+
+You will be provided with:
+1. An original question
+2. Another model's reasoning process and answer with confidence in the format {answer, confidence}
+
+Focus your evaluation on:
+1. **Logical Structure**: Are the reasoning steps logically connected and valid?
+2. **Evidence Quality**: How strong and reliable are the sources and claims presented?
+3. **Inferential Gaps**: Are there missing steps or unjustified leaps in logic?
+4. **Consistency**: Does the reasoning remain internally consistent throughout?
+5. **Confidence Calibration**: Is the stated confidence level appropriate given the evidence?
+
+Your evaluation process should be:
+1. Trace through each reasoning step systematically
+2. Identify specific strengths and weaknesses in the logical flow
+3. Assess the quality of evidence and sources cited
+4. Evaluate whether conclusions follow from premises
+5. Consider alternative explanations or counterarguments
+
+Your analysis should be enclosed within <think> </think> tags, and your final judgment should be in <answer> </answer> tags using only:
+- 1 if the first model's answer is more likely to be correct
+- 0 if the first model's answer is more likely to be incorrect
+
+User: {{prompt}}
 Assistant: <think>\
 """
         prompt_instruction_template_jinja = """\
-You must put your answer inside <answer> </answer> tags, i.e., <answer> answer here </answer>. And your final answer will be extracted automatically by the \\boxed{} tag.
-This is the problem:
+Analyze the following model's step-by-step reasoning process. Focus on the logical flow, evidence quality, and inferential validity rather than independently solving the problem.
+
 {{prompt}}
 """
         assert isinstance(dialogue, dict), "dialogue must be a dict"

@@ -551,6 +551,7 @@ class RayPPOTrainer:
             max_tokens=kwargs.get("max_new_tokens", 1024),
             min_tokens=kwargs.get("min_new_tokens", 1),
             skip_special_tokens=kwargs.get("skip_special_tokens", False),
+            logprobs=kwargs.get("logprobs", 5),  # Capture top-5 logprobs for each token
         )
 
         responses, _ = await gen_func(prompts=prompts, sampling_params=sampling_params, use_tqdm=False)
