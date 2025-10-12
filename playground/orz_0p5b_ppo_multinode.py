@@ -33,19 +33,19 @@ class PPOExpConfig(BasePPOExpConfig):
     use_orm_score: bool = False
 
     # Conditional settings with production values first  
-    total_num_nodes: int = 1  # Single node with 4 GPUs
+    total_num_nodes: int = 2  # Single node with 4 GPUs
 
     # resource related settings
     ref_num_nodes: int = total_num_nodes
     ref_num_gpus_per_node: int = 1  
     actor_num_nodes: int = total_num_nodes
-    actor_num_gpus_per_node: int = 2  
+    actor_num_gpus_per_node: int = 1  
     critic_num_nodes: int = total_num_nodes
     critic_num_gpus_per_node: int = 1 
     colocate_all: bool = False  
     colocate_critic_reward: bool = False
     colocate_actor_ref: bool = False  
-    vllm_num_engines: int = 4  
+    vllm_num_engines: int = 10
     vllm_tensor_parallel_size: int = 1
     adam_offload: bool = False
     zero_stage: int = 3
@@ -58,21 +58,23 @@ class PPOExpConfig(BasePPOExpConfig):
     save_path: str = f"orz_ckpt/{file_name}"
     tensorboard_log_dir: str = f"orz_logs/{file_name}"
 
-    # GPQA reasoning evaluation dataset
+    # MathTrain dataset and Math500 eval dataset
     # data related settings
     prompt_data: ListConfig = ListConfig([
-        "data/gpqa_diamond_train.json",
+        "data/orz_math_57k_collected.json",
     ])
     eval_prompt_data: ListConfig = ListConfig(
         [
-            "data/eval_data/gpqa_diamond_eval.json",
+            "data/eval_data/math500.json",
+            "data/eval_data/aime2024.json",
+            "data/eval_data/gpqa_diamond.json",
         ]
     )
     prompt_data_probs: ListConfig = ListConfig([1.0])
 
     # ppo related settings
     actor_learning_rate: float = 1e-6
-    critic_lear22ning_rate: float = 5e-6
+    critic_learning_rate: float = 5e-6
     num_warmup_steps: int = 50
     prompt_max_len: int = 2048
     enable_prefix_caching: bool = True
